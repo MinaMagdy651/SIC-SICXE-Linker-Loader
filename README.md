@@ -21,6 +21,8 @@ You can either run it by running the following code and typing the input file an
 python main.py
 ```
 
+## Test files are attached
+
 or you can simply run the <strong>run.bat </strong> file
 
 [GitHub](https://github.com/amwopps/SIC-SICXE-Linker-Loader)
