@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 def open_file(file):
     with open(file) as f:
         program = [line[: -1] for line in f]
@@ -39,3 +40,23 @@ def text_record(text_record):
         'Start': start,
         'Values': values
     }
+def empty_memory_graph():
+    return pd.DataFrame(columns = ['Memory_Address', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'])
+
+def memory_allocation(text_records, memory_graph, starting_address):
+    for record in text_records:
+        record['Start'] = add_hex(record['Start'], starting_address)
+        
+        start = record['Start'][:-1] + '0'
+        column = record['Start'][-1]
+        values = record['Values']
+        index = memory_graph[memory_graph.Memory_Address == start].index
+
+        for value in values:
+            memory_graph.loc[index, column] = value
+            column = add_hex(column, '1')
+
+            if column == '10':
+                index += 1
+                column = '0'
+    return memory_graph
