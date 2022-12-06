@@ -1,0 +1,48 @@
+{
+  "Name": "PROGA ",
+  "Length": "0063",
+  "Definitions": [
+    { "Symbol": "LISTA", "Address": "0040" },
+    { "Symbol": "ENDA", "Address": "0054" }
+  ],
+  "References": ["LISTB", "ENDB", "LISTC", "ENDC"],
+  "T-Records": [
+    {
+      "Start": "0020",
+      "Values": ["03", "20", "1D", "77", "10", "00", "04", "05", "00", "14"]
+    },
+    {
+      "Start": "0054",
+      "Values": [
+        "00",
+        "00",
+        "14",
+        "FF",
+        "FF",
+        "F6",
+        "00",
+        "00",
+        "3F",
+        "00",
+        "00",
+        "14",
+        "FF",
+        "FF",
+        "C0"
+      ]
+    }
+  ],
+  "M-Records": [
+    { "Address": "000024", "Size": "05", "Operaiton": "+LISTB" },
+    { "Address": "000054", "Size": "06", "Operaiton": "+LISTC" },
+    { "Address": "000057", "Size": "06", "Operaiton": "+ENDC" },
+    { "Address": "000057", "Size": "06", "Operaiton": "-LISTC" },
+    { "Address": "00005A", "Size": "06", "Operaiton": "+ENDC" },
+    { "Address": "00005A", "Size": "06", "Operaiton": "-LISTC" },
+    { "Address": "00005A", "Size": "06", "Operaiton": "+PROGA" },
+    { "Address": "00005D", "Size": "06", "Operaiton": "-ENDB" },
+    { "Address": "00005D", "Size": "06", "Operaiton": "+LISTB" },
+    { "Address": "000060", "Size": "06", "Operaiton": "+LISTB" },
+    { "Address": "000060", "Size": "06", "Operaiton": "-PROGA" }
+  ]
+}
