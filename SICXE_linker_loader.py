@@ -1,9 +1,9 @@
 import pandas as pd
 import re
-from utils import add_hex, get_memory_dimension, get_memory_addresses, get_text_records, memory_allocation, empty_memory_graph
+from utils import add_hex, sub_hex, get_memory_dimension, get_memory_addresses, get_text_records, memory_allocation, empty_memory_graph, out_estab
 
 def control_section_head_info(head_record):
-    name = head_record[1: 7]
+    name = head_record[1: 7].strip()
     length = head_record[15: ]
     return name, length
 
@@ -37,7 +37,7 @@ def control_section_modification(control_section):
             modification_list.append({
                 'Address': address,
                 'Size': size,
-                'Operaiton': operation
+                'Operation': operation
             })
             
     return  modification_list
@@ -105,6 +105,75 @@ def get_estab_dict(estab_df):
         
     return list
     
+
+def sicxe_memory_allocation(control_sections, memory_graph, estab_dict):
+    for control_section in control_sections:
+        memory_graph = memory_allocation(control_section['T-Records'], memory_graph, estab_dict[control_section['Name']])
+    return memory_graph
+
+def memory_modifier(memory_graph, address, size, operation, estab_dict):
+    start = address[:-1]+ '0'
+    column = address[-1]
+    old_column = column
+    index = memory_graph[memory_graph.Memory_Address == start].index[0]
+    old_index = index
+    old_value = ' '
+    for i in range(3):
+        old_value += memory_graph.loc[index, column]
+        column = add_hex(column, '1')
+        if column == '10':
+            index += 1
+            column = '0'
+            
+    old_value = old_value.strip()
+        
+    column = old_column
+    index = old_index
+    
+    symbol = operation[1: ]
+    operand = estab_dict[symbol]
+    if(size == '05'):
+        if(operation[0] == '+'):
+            new_value = old_value[0] + add_hex(old_value[1: ], operand).zfill(5)
+        else:
+            new_value = old_value[0] + sub_hex(old_value[1: ], operand).zfill(5)
+            
+    else:
+        if(operation[0] == '+'):
+            new_value = add_hex(old_value, operand)
+        else:
+            new_value = sub_hex(old_value, operand)
+            
+    
+    new_value = new_value.zfill(6)
+    #Overflow
+    if len(new_value) == 7:
+        new_value = new_value[1: ]
+        
+    new_value = re.findall('..?', new_value)
+
+    for i in range(3):
+        memory_graph.loc[index, column] = new_value[i]
+        
+        column = add_hex(column, '1')
+        if column == '10':
+            index += 1
+            column = '0'
+    
+    return memory_graph
+
+def apply_m_record(memory_graph, control_sections, estab_dict):
+    for control_section in control_sections:
+        name = control_section['Name']
+        starting_address = estab_dict[name]
+        m_records = control_section['M-Records']
+        for record in m_records:
+            address = add_hex(record['Address'], starting_address)
+            size = record['Size']
+            operation = record['Operation']
+            memory_graph = memory_modifier(memory_graph, address, size, operation, estab_dict)
+    return memory_graph
+
 def linker_loader(program):
     starting_address = str(input('Starting Address: '))
     control_sections = get_control_sections(program)
@@ -116,8 +185,8 @@ def linker_loader(program):
     memory_graph = empty_memory_graph()
     memory_graph.Memory_Address = memory_addresses
     memory_graph.fillna('xx', inplace = True)
-
-    for control_section in control_sections:
-        memory_graph = memory_allocation(control_section['T-Records'], memory_graph, estab_dict[control_section['Name']])
+    memory_graph = sicxe_memory_allocation(control_sections, memory_graph, estab_dict)
+    memory_graph = apply_m_record(memory_graph, control_sections, estab_dict)
+    out_estab(estab_df)
 
     return memory_graph

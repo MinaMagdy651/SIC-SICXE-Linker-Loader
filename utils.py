@@ -9,6 +9,12 @@ def open_file(file):
 def add_hex(num1, num2):
     return hex(int(num1, 16) + int(num2, 16))[2: ].upper()
 
+def sub_hex(num1, num2):
+    answer = hex(int(num1, 16) - int(num2, 16)).upper()
+    if answer[0] == '-':
+        return '-' + answer[3: ]
+    return answer[2:]
+
 def get_prog_dimension(head_record):
     start = head_record[9: 13]
     length = head_record[15: ]
@@ -60,3 +66,11 @@ def memory_allocation(text_records, memory_graph, starting_address):
                 index += 1
                 column = '0'
     return memory_graph
+
+def out_estab(df):
+    fout = open("outputs/Ext_Sym_Table.txt", "wt")
+    fout.write('{0}\t{1}\t{2}\t{3}\n\n'.format('CS'.ljust(8, ' '), 'SYM'.ljust(8, ' '), 'ADD'.ljust(8, ' '), 'LEN'.ljust(8, ' ')))
+    for ind in df.index:
+        fout.write('{0}\t{1}\t{2}\t{3}\n'.format(df.Control_Section[ind].ljust(8, ' '), df.Symbol_Name[ind].ljust(8, ' '), df.Address[ind].ljust(8, ' '), df.Length[ind].ljust(8, ' ')))
+    fout.close()
+    return

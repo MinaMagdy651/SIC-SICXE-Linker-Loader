@@ -33,16 +33,16 @@
     }
   ],
   "M-Records": [
-    { "Address": "000024", "Size": "05", "Operaiton": "+LISTB" },
-    { "Address": "000054", "Size": "06", "Operaiton": "+LISTC" },
-    { "Address": "000057", "Size": "06", "Operaiton": "+ENDC" },
-    { "Address": "000057", "Size": "06", "Operaiton": "-LISTC" },
-    { "Address": "00005A", "Size": "06", "Operaiton": "+ENDC" },
-    { "Address": "00005A", "Size": "06", "Operaiton": "-LISTC" },
-    { "Address": "00005A", "Size": "06", "Operaiton": "+PROGA" },
-    { "Address": "00005D", "Size": "06", "Operaiton": "-ENDB" },
-    { "Address": "00005D", "Size": "06", "Operaiton": "+LISTB" },
-    { "Address": "000060", "Size": "06", "Operaiton": "+LISTB" },
-    { "Address": "000060", "Size": "06", "Operaiton": "-PROGA" }
+    { "Address": "000024", "Size": "05", "Operation": "+LISTB" },
+    { "Address": "000054", "Size": "06", "Operation": "+LISTC" },
+    { "Address": "000057", "Size": "06", "Operation": "+ENDC" },
+    { "Address": "000057", "Size": "06", "Operation": "-LISTC" },
+    { "Address": "00005A", "Size": "06", "Operation": "+ENDC" },
+    { "Address": "00005A", "Size": "06", "Operation": "-LISTC" },
+    { "Address": "00005A", "Size": "06", "Operation": "+PROGA" },
+    { "Address": "00005D", "Size": "06", "Operation": "-ENDB" },
+    { "Address": "00005D", "Size": "06", "Operation": "+LISTB" },
+    { "Address": "000060", "Size": "06", "Operation": "+LISTB" },
+    { "Address": "000060", "Size": "06", "Operation": "-PROGA" }
   ]
 }
