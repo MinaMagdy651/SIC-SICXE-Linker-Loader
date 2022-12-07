@@ -1,14 +1,18 @@
 import pandas as pd
 import re
-from utils import add_hex, sub_hex, get_memory_dimension, get_memory_addresses, get_text_records, memory_allocation, empty_memory_graph, out_estab
+from utils import *
 
+
+#Getting name and length of a control section
 def control_section_head_info(head_record):
     name = head_record[1: 7].strip()
     length = head_record[15: ]
     return name, length
 
+#Parsing Definitions and references
 def control_section_defintion_reference(definition, reference):
     definition = definition[1: ]
+    #Split by 6 charachters each
     definition = re.findall('......?', definition)
     i = 0
     definitions = []
@@ -27,6 +31,7 @@ def control_section_defintion_reference(definition, reference):
     
     return definitions, references
 
+#Parsing Modification records 
 def control_section_modification(control_section):
     modification_list = []
     for line in control_section:
@@ -42,6 +47,7 @@ def control_section_modification(control_section):
             
     return  modification_list
 
+#Parsing control sections ps:check temp.json for clarification
 def get_control_sections(program):
     control_sections = []
     control_section = []
@@ -65,9 +71,12 @@ def get_control_sections(program):
 
     return control_sections
 
+#ESTAB DataFrame and calculating the total length
 def get_estab_df(control_sections, starting_address):
     dict = []
     total_length = starting_address
+
+    #Control sections names and addresses and length
     for control_section in control_sections:
         name = control_section['Name']
         address = starting_address
@@ -79,8 +88,11 @@ def get_estab_df(control_sections, starting_address):
         })
         total_length = add_hex(total_length, control_section['Length'])
         
+        #Definitions sbymbols and addresses
         for definition in control_section['Definitions']:
             symbol = definition['Symbol']
+            
+            #Adding the starting address of each control section to its definitions
             address = add_hex(definition['Address'], starting_address)
             
             dict.append({
@@ -89,9 +101,12 @@ def get_estab_df(control_sections, starting_address):
                 'Address': address,
                 'Length': ' '
                 })
+
+        #Calculating the new starting address
         starting_address = add_hex(starting_address, control_section['Length'])
     return pd.DataFrame(dict), total_length
-    
+
+#Transforming the ESTAB DataFrame to a Dictonary for easier search
 def get_estab_dict(estab_df):
     list = {}
     for i in range(len(estab_df)):
@@ -105,12 +120,13 @@ def get_estab_dict(estab_df):
         
     return list
     
-
+#Memory Allocation for SICXE
 def sicxe_memory_allocation(control_sections, memory_graph, estab_dict):
     for control_section in control_sections:
         memory_graph = memory_allocation(control_section['T-Records'], memory_graph, estab_dict[control_section['Name']])
     return memory_graph
 
+#Memory modifier for each operation
 def memory_modifier(memory_graph, address, size, operation, estab_dict):
     start = address[:-1]+ '0'
     column = address[-1]
@@ -146,12 +162,14 @@ def memory_modifier(memory_graph, address, size, operation, estab_dict):
             
     
     new_value = new_value.zfill(6)
+
     #Overflow
     if len(new_value) == 7:
         new_value = new_value[1: ]
         
     new_value = re.findall('..?', new_value)
 
+    #Overwriting the old values with  the new values instead 
     for i in range(3):
         memory_graph.loc[index, column] = new_value[i]
         
@@ -162,6 +180,7 @@ def memory_modifier(memory_graph, address, size, operation, estab_dict):
     
     return memory_graph
 
+#Appling all M-Records on memory graph
 def apply_m_record(memory_graph, control_sections, estab_dict):
     for control_section in control_sections:
         name = control_section['Name']
@@ -175,18 +194,38 @@ def apply_m_record(memory_graph, control_sections, estab_dict):
     return memory_graph
 
 def linker_loader(program):
+    #Inputting the starting address
     starting_address = str(input('Starting Address: '))
+
+    #Deviding the control sections
     control_sections = get_control_sections(program)
+
+    #Generating ESTAB DataFrame
     estab_df, end = get_estab_df(control_sections, starting_address)
+
+    #Generating ESTAB Dictionary
     estab_dict = get_estab_dict(estab_df)
+
+    #Getting Memory Start and end
     memory_start, memory_end = get_memory_dimension(starting_address, end)
+
+    #Calculating memory addresses
     memory_addresses = get_memory_addresses(memory_start, memory_end)
     
+    #Generating empty Memory graph
     memory_graph = empty_memory_graph()
+
+    #Filling memory graph with memory addresses
     memory_graph.Memory_Address = memory_addresses
+
     memory_graph.fillna('xx', inplace = True)
+
+    #Filling memory graph with T-Records
     memory_graph = sicxe_memory_allocation(control_sections, memory_graph, estab_dict)
+
+    #Appling the M-Records
     memory_graph = apply_m_record(memory_graph, control_sections, estab_dict)
+    
     out_estab(estab_df)
 
     return memory_graph
