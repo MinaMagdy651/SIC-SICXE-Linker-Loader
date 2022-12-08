@@ -1,11 +1,11 @@
 CS      	SYM     	ADD     	LEN     
 
-PROGA   	        	4000    	0063    
-        	LISTA   	4040    	        
-        	ENDA    	4054    	        
-PROGB   	        	4063    	007F    
-        	LISTB   	40C3    	        
-        	ENDB    	40D3    	        
-PROGC   	        	40E2    	0051    
-        	LISTC   	4112    	        
-        	ENDC    	4124    	        
+PROGA   	        	0000    	0063    
+        	LISTA   	0040    	        
+        	ENDA    	0054    	        
+PROGB   	        	0063    	007F    
+        	LISTB   	00C3    	        
+        	ENDB    	00D3    	        
+PROGC   	        	00E2    	0051    
+        	LISTC   	0112    	        
+        	ENDC    	0124    	        

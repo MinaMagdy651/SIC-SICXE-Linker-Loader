@@ -34,7 +34,7 @@ def get_memory_dimension(start, length):
 def get_memory_addresses(memory_start, memory_end):
     memory_addresses = []
     while(int(memory_start, 16) <= int(memory_end, 16)):
-        memory_addresses.append(memory_start)
+        memory_addresses.append(memory_start.zfill(4))
         memory_start = add_hex(memory_start, '10')
     return memory_addresses
 
@@ -63,18 +63,18 @@ def empty_memory_graph():
 #Allocating T-Records to the memory graph
 def memory_allocation(text_records, memory_graph, starting_address):
     for record in text_records:
-        record['Start'] = add_hex(record['Start'], starting_address)
+        record['Start'] = add_hex(record['Start'], starting_address).zfill(4)
         start = record['Start'][:-1] + '0'
         column = record['Start'][-1]
         values = record['Values']
 
         #Getting the index 
         index = memory_graph[memory_graph.Memory_Address == start].index
-
+        
         for value in values:
             memory_graph.loc[index, column] = value
             column = add_hex(column, '1')
-
+            
             #Handling if a record has to jump to a new memory address
             if column == '10':
                 index += 1

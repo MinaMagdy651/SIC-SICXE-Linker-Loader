@@ -83,7 +83,7 @@ def get_estab_df(control_sections, starting_address):
         dict.append({
             'Control_Section':name,
             'Symbol_Name': ' ',
-            'Address': address,
+            'Address': address.zfill(4),
             'Length': control_section['Length']
         })
         total_length = add_hex(total_length, control_section['Length'])
@@ -98,13 +98,13 @@ def get_estab_df(control_sections, starting_address):
             dict.append({
                 'Control_Section':' ',
                 'Symbol_Name': symbol,
-                'Address': address,
+                'Address': address.zfill(4),
                 'Length': ' '
                 })
 
         #Calculating the new starting address
         starting_address = add_hex(starting_address, control_section['Length'])
-    return pd.DataFrame(dict), total_length
+    return pd.DataFrame(dict), total_length.zfill(4)
 
 #Transforming the ESTAB DataFrame to a Dictonary for easier search
 def get_estab_dict(estab_df):
@@ -187,7 +187,7 @@ def apply_m_record(memory_graph, control_sections, estab_dict):
         starting_address = estab_dict[name]
         m_records = control_section['M-Records']
         for record in m_records:
-            address = add_hex(record['Address'], starting_address)
+            address = add_hex(record['Address'], starting_address).zfill(4)
             size = record['Size']
             operation = record['Operation']
             memory_graph = memory_modifier(memory_graph, address, size, operation, estab_dict)
@@ -208,7 +208,7 @@ def linker_loader(program):
 
     #Getting Memory Start and end
     memory_start, memory_end = get_memory_dimension(starting_address, end)
-
+    
     #Calculating memory addresses
     memory_addresses = get_memory_addresses(memory_start, memory_end)
     
@@ -219,7 +219,7 @@ def linker_loader(program):
     memory_graph.Memory_Address = memory_addresses
 
     memory_graph.fillna('xx', inplace = True)
-
+    
     #Filling memory graph with T-Records
     memory_graph = sicxe_memory_allocation(control_sections, memory_graph, estab_dict)
 
